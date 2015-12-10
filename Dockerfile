@@ -10,6 +10,7 @@ RUN apt-key adv --keyserver keyserver.ubuntu.com --recv E1DD270288B4E6030699E45F
       zlib1g libyaml-0-2 libssl1.0.0 \
       libgdbm3 libreadline6 libncurses5 libffi6 \
       libxml2 libxslt1.1 libcurl3 libicu52 \
+	  g++ gcc libc6-dev make \
 && gem install --no-document bundler \
 && rm -rf /var/lib/apt/lists/* # 20150712
 
@@ -21,6 +22,27 @@ ADD assets/init /app/init
 RUN chmod 755 /app/init
 
 VOLUME ["/home/gitlab_ci_runner/data"]
+
+
+ENV GOLANG_VERSION 1.5.2
+ENV GOLANG_DOWNLOAD_URL https://golang.org/dl/go$GOLANG_VERSION.linux-amd64.tar.gz
+ENV GOLANG_DOWNLOAD_SHA1 cae87ed095e8d94a81871281d35da7829bd1234e
+
+RUN curl -fsSL "$GOLANG_DOWNLOAD_URL" -o golang.tar.gz \
+	&& echo "$GOLANG_DOWNLOAD_SHA1  golang.tar.gz" | sha1sum -c - \
+	&& tar -C /usr/local -xzf golang.tar.gz \
+	&& rm golang.tar.gz
+
+ENV GOPATH /go
+ENV PATH $GOPATH/bin:/usr/local/go/bin:$PATH
+
+RUN mkdir -p "$GOPATH/src" "$GOPATH/bin" && chmod -R 777 "$GOPATH"
+WORKDIR $GOPATH
+
+COPY go-wrapper /usr/local/bin
+
+RUN go get github.com/tools/godep
+
 
 ENTRYPOINT ["/app/init"]
 CMD ["app:start"]
