@@ -13,7 +13,7 @@ RUN apt-key adv --keyserver keyserver.ubuntu.com --recv E1DD270288B4E6030699E45F
       zlib1g libyaml-0-2 libssl1.0.0 \
       libgdbm3 libreadline6 libncurses5 libffi6 \
       libxml2 libxslt1.1 libcurl3 libicu52 \
-	  g++ gcc libc6-dev make curl\
+	  g++ gcc libc6-dev make curl mongo-clients\
 && gem install --no-document bundler \
 && rm -rf /var/lib/apt/lists/* # 20150712
 
@@ -40,8 +40,6 @@ ENV GOPATH /go
 ENV PATH $GOPATH/bin:/usr/local/go/bin:$PATH
 
 RUN mkdir -p "$GOPATH/src" "$GOPATH/bin" && chmod -R 777 "$GOPATH"
-
-COPY $GOPATH/go-wrapper /usr/local/bin
 
 RUN go get github.com/tools/godep
 
